@@ -14,6 +14,7 @@ import android.support.v4.content.LocalBroadcastManager;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.app.ActionBar;
 import android.os.Bundle;
+import android.support.v7.widget.AppCompatTextView;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.helper.ItemTouchHelper;
@@ -55,11 +56,14 @@ public class MyStocksActivity extends AppCompatActivity implements LoaderManager
   private Context mContext;
   private Cursor mCursor;
   boolean isConnected;
+  private AppCompatTextView emptyListMessage;
+  private RecyclerView recyclerView;
 
   @Override
   protected void onCreate(Bundle savedInstanceState) {
     super.onCreate(savedInstanceState);
     mContext = this;
+
     ConnectivityManager cm =
         (ConnectivityManager) mContext.getSystemService(Context.CONNECTIVITY_SERVICE);
 
@@ -67,6 +71,9 @@ public class MyStocksActivity extends AppCompatActivity implements LoaderManager
     isConnected = activeNetwork != null &&
         activeNetwork.isConnectedOrConnecting();
     setContentView(R.layout.activity_my_stocks);
+
+    emptyListMessage = (AppCompatTextView) findViewById(R.id.empty_list_message);
+    recyclerView = (RecyclerView) findViewById(R.id.recycler_view);
     // The intent service is for executing immediate pulls from the Yahoo API
     // GCMTaskService can only schedule tasks, they cannot execute immediately
     mServiceIntent = new Intent(this, StockIntentService.class);
@@ -79,7 +86,7 @@ public class MyStocksActivity extends AppCompatActivity implements LoaderManager
         networkToast();
       }
     }
-    RecyclerView recyclerView = (RecyclerView) findViewById(R.id.recycler_view);
+
     recyclerView.setLayoutManager(new LinearLayoutManager(this));
     getLoaderManager().initLoader(CURSOR_LOADER_ID, null, this);
 
@@ -186,6 +193,7 @@ public class MyStocksActivity extends AppCompatActivity implements LoaderManager
 
     public void networkToast(){
     Toast.makeText(mContext, getString(R.string.network_toast), Toast.LENGTH_SHORT).show();
+      setInternetProblemMessage();
   }
 
   public void restoreActionBar() {
@@ -238,6 +246,11 @@ public class MyStocksActivity extends AppCompatActivity implements LoaderManager
   public void onLoadFinished(Loader<Cursor> loader, Cursor data){
     mCursorAdapter.swapCursor(data);
     mCursor = data;
+    if( data!=null && data.getCount()==0){
+      setEmptyListMessage();
+    }else{
+      hideMessage();
+    }
   }
 
   @Override
@@ -245,4 +258,19 @@ public class MyStocksActivity extends AppCompatActivity implements LoaderManager
     mCursorAdapter.swapCursor(null);
   }
 
+  private void setEmptyListMessage(){
+    emptyListMessage.setVisibility(View.VISIBLE);
+    recyclerView.setVisibility(View.GONE);
+  }
+
+  private void setInternetProblemMessage(){
+    emptyListMessage.setVisibility(View.VISIBLE);
+    emptyListMessage.setText(getResources().getString(R.string.no_internet_message));
+    recyclerView.setVisibility(View.GONE);
+  }
+
+  private void hideMessage(){
+    emptyListMessage.setVisibility(View.GONE);
+    recyclerView.setVisibility(View.VISIBLE);
+  }
 }
