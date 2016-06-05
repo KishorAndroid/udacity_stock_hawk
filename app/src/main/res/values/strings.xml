@@ -1,5 +1,5 @@
 <resources>
-  <string name="app_name">Stock Hawk</string>
+  <string name="app_name" translatable="false">Stock Hawk</string>
 
   <string name="action_example">Example action</string>
 
@@ -12,4 +12,5 @@
   <string name="network_toast">Uh-oh! This app requires an internet connection</string>
   <string name="empty_list_message">No Data Available</string>
   <string name="no_internet_message">No Internet Available</string>
+  <string name="add_stock_button_description">Add Stock</string>
 </resources>
