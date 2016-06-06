@@ -31,6 +31,7 @@ import com.sam_chordas.android.stockhawk.data.QuoteProvider;
 import com.sam_chordas.android.stockhawk.rest.QuoteCursorAdapter;
 import com.sam_chordas.android.stockhawk.rest.RecyclerViewItemClickListener;
 import com.sam_chordas.android.stockhawk.rest.Utils;
+import com.sam_chordas.android.stockhawk.service.StockHistoryIntentService;
 import com.sam_chordas.android.stockhawk.service.StockIntentService;
 import com.sam_chordas.android.stockhawk.service.StockTaskService;
 import com.google.android.gms.gcm.GcmNetworkManager;
@@ -183,6 +184,8 @@ public class MyStocksActivity extends AppCompatActivity implements LoaderManager
         super.onStart();
         LocalBroadcastManager.getInstance(this).registerReceiver(noResultsFoundReceiver,
                 new IntentFilter("no-stock-results-found"));
+
+      startService(new Intent(this, StockHistoryIntentService.class));
     }
 
     @Override
