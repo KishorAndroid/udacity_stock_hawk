@@ -95,8 +95,11 @@ public class MyStocksActivity extends AppCompatActivity implements LoaderManager
     recyclerView.addOnItemTouchListener(new RecyclerViewItemClickListener(this,
             new RecyclerViewItemClickListener.OnItemClickListener() {
               @Override public void onItemClick(View v, int position) {
-                //TODO:
-                // do something on item click
+                Cursor cursor = mCursorAdapter.getCursor();
+                cursor.moveToPosition(position);
+                Intent intent = new Intent(mContext, StockHistoryActivity.class);
+                intent.putExtra("SYMBOL", cursor.getString(cursor.getColumnIndex("symbol")));
+                mContext.startActivity(intent);
               }
             }));
     recyclerView.setAdapter(mCursorAdapter);
@@ -201,8 +204,6 @@ public class MyStocksActivity extends AppCompatActivity implements LoaderManager
         super.onStart();
         LocalBroadcastManager.getInstance(this).registerReceiver(noResultsFoundReceiver,
                 new IntentFilter("stock-status"));
-
-      startService(new Intent(this, StockHistoryIntentService.class));
     }
 
     @Override
@@ -266,8 +267,10 @@ public class MyStocksActivity extends AppCompatActivity implements LoaderManager
   public void onLoadFinished(Loader<Cursor> loader, Cursor data){
     mCursorAdapter.swapCursor(data);
     mCursor = data;
-    if( data!=null && data.getCount()==0){
+    if( data!=null && mCursorAdapter.getItemCount() == 0){
       setEmptyListMessage();
+    } else {
+      hideMessage();
     }
   }
 

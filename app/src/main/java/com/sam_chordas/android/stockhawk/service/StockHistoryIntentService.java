@@ -25,9 +25,13 @@ public class StockHistoryIntentService extends IntentService {
     protected void onHandleIntent(Intent intent) {
 
         try {
-            String historicalData = fetchData(prepareYQLQuery("AAPL"));
+            String historicalData = fetchData(prepareYQLQuery(intent.getStringExtra("SYMBOL")));
 
+            //TODO Remove
+            Log.d(StockHistoryIntentService.class.getSimpleName(), "SYMBOL " + intent.getStringExtra("SYMBOL"));
             Log.d(StockHistoryIntentService.class.getSimpleName(), historicalData);
+
+
         } catch (IOException e) {
             e.printStackTrace();
         }
@@ -39,7 +43,7 @@ public class StockHistoryIntentService extends IntentService {
 
         urlStringBuilder.append("https://query.yahooapis.com/v1/public/yql?q=");
         urlStringBuilder.append(URLEncoder.encode("select * from yahoo.finance.historicaldata where symbol "
-                + " == " + stockSymbol + " and startDate = \"2009-09-11\" and endDate = \"2010-03-10\"", "UTF-8"));
+                + " = \'" + stockSymbol + "\' and startDate = \'2009-09-11\' and endDate = \'2010-03-10\'", "UTF-8"));
         urlStringBuilder.append("&format=json&diagnostics=true&env=store%3A%2F%2Fdatatables."
                 + "org%2Falltableswithkeys&callback=");
 
