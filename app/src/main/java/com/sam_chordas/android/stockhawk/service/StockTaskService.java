@@ -48,6 +48,8 @@ public class StockTaskService extends GcmTaskService{
   public static final int STOCK_STATUS_UNKNOWN = 3;
   public static final int STOCK_STATUS_INVALID = 4;
 
+  private int stockStatus = STOCK_STATUS_OK;
+
   public StockTaskService(){}
 
   public StockTaskService(Context context){
@@ -75,6 +77,7 @@ public class StockTaskService extends GcmTaskService{
       urlStringBuilder.append(URLEncoder.encode("select * from yahoo.finance.quotes where symbol "
         + "in (", "UTF-8"));
     } catch (UnsupportedEncodingException e) {
+      stockStatus = STOCK_STATUS_INVALID;
       e.printStackTrace();
     }
     if (params.getTag().equals("init") || params.getTag().equals("periodic")){
@@ -88,6 +91,7 @@ public class StockTaskService extends GcmTaskService{
           urlStringBuilder.append(
               URLEncoder.encode("\"YHOO\",\"AAPL\",\"GOOG\",\"MSFT\")", "UTF-8"));
         } catch (UnsupportedEncodingException e) {
+          stockStatus = STOCK_STATUS_INVALID;
           e.printStackTrace();
         }
       } else if (initQueryCursor != null){
@@ -102,6 +106,7 @@ public class StockTaskService extends GcmTaskService{
         try {
           urlStringBuilder.append(URLEncoder.encode(mStoredSymbols.toString(), "UTF-8"));
         } catch (UnsupportedEncodingException e) {
+          stockStatus = STOCK_STATUS_INVALID;
           e.printStackTrace();
         }
       }
@@ -112,6 +117,7 @@ public class StockTaskService extends GcmTaskService{
       try {
         urlStringBuilder.append(URLEncoder.encode("\""+stockInput+"\")", "UTF-8"));
       } catch (UnsupportedEncodingException e){
+        stockStatus = STOCK_STATUS_INVALID;
         e.printStackTrace();
       }
     }
@@ -140,23 +146,28 @@ public class StockTaskService extends GcmTaskService{
           mContext.getContentResolver().applyBatch(QuoteProvider.AUTHORITY,
               Utils.quoteJsonToContentVals(getResponse));
         }catch (RemoteException | OperationApplicationException e){
+          stockStatus = STOCK_STATUS_INVALID;
           Log.e(LOG_TAG, "Error applying batch insert", e);
           result = GcmNetworkManager.RESULT_FAILURE;
         }
       catch (Exception e){
+        stockStatus = STOCK_STATUS_INVALID;
         Log.e(LOG_TAG, "Error applying batch insert", e);
         result = GcmNetworkManager.RESULT_FAILURE;
       }
       } catch (IOException e){
+        stockStatus = STOCK_STATUS_INVALID;
         e.printStackTrace();
         result = GcmNetworkManager.RESULT_FAILURE;
       } catch (NullPointerException e){
+        stockStatus = STOCK_STATUS_INVALID;
         result = GcmNetworkManager.RESULT_FAILURE;
       }
     }
 
     if(result == GcmNetworkManager.RESULT_FAILURE){
-      Intent intent = new Intent("no-stock-results-found");
+      Intent intent = new Intent("stock-status");
+      intent.putExtra("STOCK_STATUS", stockStatus);
       LocalBroadcastManager.getInstance(mContext).sendBroadcast(intent);
     }
 

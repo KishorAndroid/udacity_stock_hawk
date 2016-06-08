@@ -106,7 +106,13 @@ public class MyStocksActivity extends AppCompatActivity implements LoaderManager
     fab.attachToRecyclerView(recyclerView);
     fab.setOnClickListener(new View.OnClickListener() {
       @Override public void onClick(View v) {
+        ConnectivityManager cm =
+                (ConnectivityManager) mContext.getSystemService(Context.CONNECTIVITY_SERVICE);
+        NetworkInfo activeNetwork = cm.getActiveNetworkInfo();
+        isConnected = activeNetwork != null &&
+                activeNetwork.isConnectedOrConnecting();
         if (isConnected){
+          hideMessage();
           new MaterialDialog.Builder(mContext).title(R.string.symbol_search)
               .content(R.string.content_test)
               .inputType(InputType.TYPE_CLASS_TEXT)
@@ -169,7 +175,18 @@ public class MyStocksActivity extends AppCompatActivity implements LoaderManager
   private BroadcastReceiver noResultsFoundReceiver = new BroadcastReceiver() {
     @Override
     public void onReceive(Context context, Intent intent) {
-        Toast.makeText(context, "No Stocks Found", Toast.LENGTH_SHORT).show();
+      int stockStatus = intent.getIntExtra("STOCK_STATUS", 0);
+      switch (stockStatus){
+        case StockTaskService.STOCK_STATUS_OK:
+          break;
+        case StockTaskService.STOCK_STATUS_INVALID:
+          Toast.makeText(context, "No Stocks Found", Toast.LENGTH_SHORT).show();
+          break;
+        case StockTaskService.STOCK_STATUS_SERVER_DOWN:
+        case StockTaskService.STOCK_STATUS_SERVER_INVALID:
+        case StockTaskService.STOCK_STATUS_UNKNOWN:
+          setInternetProblemMessage();
+      }
     }
   };
 
@@ -183,7 +200,7 @@ public class MyStocksActivity extends AppCompatActivity implements LoaderManager
     protected void onStart() {
         super.onStart();
         LocalBroadcastManager.getInstance(this).registerReceiver(noResultsFoundReceiver,
-                new IntentFilter("no-stock-results-found"));
+                new IntentFilter("stock-status"));
 
       startService(new Intent(this, StockHistoryIntentService.class));
     }
@@ -251,8 +268,6 @@ public class MyStocksActivity extends AppCompatActivity implements LoaderManager
     mCursor = data;
     if( data!=null && data.getCount()==0){
       setEmptyListMessage();
-    }else{
-      hideMessage();
     }
   }
 
@@ -263,17 +278,14 @@ public class MyStocksActivity extends AppCompatActivity implements LoaderManager
 
   private void setEmptyListMessage(){
     emptyListMessage.setVisibility(View.VISIBLE);
-    recyclerView.setVisibility(View.GONE);
   }
 
   private void setInternetProblemMessage(){
     emptyListMessage.setVisibility(View.VISIBLE);
     emptyListMessage.setText(getResources().getString(R.string.no_internet_message));
-    recyclerView.setVisibility(View.GONE);
   }
 
   private void hideMessage(){
     emptyListMessage.setVisibility(View.GONE);
-    recyclerView.setVisibility(View.VISIBLE);
   }
 }

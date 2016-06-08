@@ -1,5 +1,5 @@
 
-<FrameLayout
+<RelativeLayout
     xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:fab="http://schemas.android.com/tools"
     android:layout_width="match_parent"
@@ -17,6 +17,7 @@
   <android.support.v7.widget.RecyclerView
       android:id="@+id/recycler_view"
       android:layout_width="match_parent"
+      android:layout_below="@id/empty_list_message"
       android:layout_height="match_parent" />
 
   <com.melnykov.fab.FloatingActionButton
@@ -26,6 +27,9 @@
       android:layout_gravity="bottom|right"
       android:layout_margin="16dp"
       android:focusable="true"
+      android:layout_alignParentBottom="true"
+      android:layout_alignParentRight="true"
+      android:layout_alignParentEnd="true"
       android:contentDescription="@string/add_stock_button_description"
       android:src="@drawable/ic_add_white_24dp"
       fab:fab_colorNormal="@color/material_blue_500"
@@ -35,4 +39,4 @@
       fab:fab_type="normal"
       fab:layout_anchor="recycler_view"
       fab:layout_anchorGravity="bottom | end" />
-</FrameLayout>
+</RelativeLayout>
