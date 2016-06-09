@@ -4,6 +4,8 @@ import android.content.ContentProviderOperation;
 import android.content.Intent;
 import android.support.v4.content.LocalBroadcastManager;
 import android.util.Log;
+
+import com.sam_chordas.android.stockhawk.data.Quote;
 import com.sam_chordas.android.stockhawk.data.QuoteColumns;
 import com.sam_chordas.android.stockhawk.data.QuoteProvider;
 import com.sam_chordas.android.stockhawk.ui.MyStocksActivity;
@@ -23,6 +25,41 @@ public class Utils {
   private static String LOG_TAG = Utils.class.getSimpleName();
 
   public static boolean showPercent = true;
+
+  public static ArrayList jsonToQuoteArrayList(String JSON){
+    ArrayList<Quote> quotes = new ArrayList<>();
+
+    JSONObject jsonObject = null;
+    JSONArray resultsArray = null;
+
+    try {
+      jsonObject = new JSONObject(JSON);
+      if(jsonObject != null && jsonObject.length() !=0){
+        jsonObject = jsonObject.getJSONObject("query");
+        resultsArray = jsonObject.getJSONObject("results").getJSONArray("quote");
+        if (resultsArray != null && resultsArray.length() != 0){
+          for (int i = 0; i < resultsArray.length(); i++){
+            jsonObject = resultsArray.getJSONObject(i);
+            Quote quote = new Quote();
+            quote.setSymbol(jsonObject.getString("Symbol"));
+            quote.setDate(jsonObject.getString("Date"));
+            quote.setOpen(jsonObject.getString("Open"));
+            quote.setHigh(jsonObject.getString("High"));
+            quote.setLow(jsonObject.getString("Low"));
+            quote.setClose(jsonObject.getString("Close"));
+            quote.setVolume(jsonObject.getString("Volume"));
+            quote.setAdjClose(jsonObject.getString("Close"));
+            quotes.add(quote);
+          }
+        }
+      }
+
+    } catch (JSONException e) {
+      e.printStackTrace();
+    }
+
+    return quotes;
+  }
 
   public static ArrayList quoteJsonToContentVals(String JSON){
     ArrayList<ContentProviderOperation> batchOperations = new ArrayList<>();
