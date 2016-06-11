@@ -17,6 +17,7 @@ import com.sam_chordas.android.stockhawk.R;
 import com.sam_chordas.android.stockhawk.data.QuoteColumns;
 import com.sam_chordas.android.stockhawk.data.QuoteProvider;
 import com.sam_chordas.android.stockhawk.service.StockHistoryIntentService;
+import com.sam_chordas.android.stockhawk.service.StockTaskService;
 import com.sam_chordas.android.stockhawk.touch_helper.ItemTouchHelperAdapter;
 import com.sam_chordas.android.stockhawk.touch_helper.ItemTouchHelperViewHolder;
 
@@ -80,6 +81,11 @@ public class QuoteCursorAdapter extends CursorRecyclerViewAdapter<QuoteCursorAda
     c.moveToPosition(position);
     String symbol = c.getString(c.getColumnIndex(QuoteColumns.SYMBOL));
     mContext.getContentResolver().delete(QuoteProvider.Quotes.withSymbol(symbol), null, null);
+
+    Intent dataUpdatedIntent = new Intent(StockTaskService.ACTION_DATA_UPDATED)
+            .setPackage(mContext.getPackageName());
+    mContext.sendBroadcast(dataUpdatedIntent);
+
     notifyItemRemoved(position);
   }
 

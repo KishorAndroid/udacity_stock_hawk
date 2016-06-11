@@ -33,6 +33,9 @@ import java.net.URLEncoder;
 public class StockTaskService extends GcmTaskService{
   private String LOG_TAG = StockTaskService.class.getSimpleName();
 
+  public static final String ACTION_DATA_UPDATED =
+          "com.sam_chordas.android.stockhawk.app.ACTION_DATA_UPDATED";
+
   private OkHttpClient client = new OkHttpClient();
   private Context mContext;
   private StringBuilder mStoredSymbols = new StringBuilder();
@@ -145,6 +148,11 @@ public class StockTaskService extends GcmTaskService{
           }
           mContext.getContentResolver().applyBatch(QuoteProvider.AUTHORITY,
               Utils.quoteJsonToContentVals(getResponse));
+
+          Intent dataUpdatedIntent = new Intent(ACTION_DATA_UPDATED)
+                  .setPackage(mContext.getPackageName());
+          mContext.sendBroadcast(dataUpdatedIntent);
+
         }catch (RemoteException | OperationApplicationException e){
           stockStatus = STOCK_STATUS_INVALID;
           Log.e(LOG_TAG, "Error applying batch insert", e);

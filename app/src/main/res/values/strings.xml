@@ -13,4 +13,5 @@
   <string name="empty_list_message">No Data Available</string>
   <string name="no_internet_message">No Internet Available</string>
   <string name="add_stock_button_description">Add Stock</string>
+  <string name="chart_description">Past 30 days stock history</string>
 </resources>
