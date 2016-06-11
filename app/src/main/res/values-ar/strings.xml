@@ -11,4 +11,8 @@
     <string name="no_internet_message">لا يوجد إنترنت متاح</string>
     <string name="add_stock_button_description">إضافة أسهم</string>
     <string name="chart_description">الماضي 30 يوما التاريخ الأسهم</string>
+    <string name="chart_legend_high">عالي</string>
+    <string name="chart_legend_low">منخفض</string>
+    <string name="chart_legend_open">فتح</string>
+    <string name="chart_legend_close">قريب</string>
 </resources>
