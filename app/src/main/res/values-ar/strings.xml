@@ -7,6 +7,8 @@
     <string name="input_hint">FB</string>
     <string name="input_prefill"></string>
     <string name="network_toast">اه أوه ! هذا التطبيق يتطلب اتصال بالإنترنت</string>
+    <string name="invalid_stock_symbol">لا الأسهم العثور</string>
+    <string name="stock_already_saved">يتم حفظ هذه الأسهم بالفعل!</string>
     <string name="empty_list_message">لا تتوافر بيانات</string>
     <string name="no_internet_message">لا يوجد إنترنت متاح</string>
     <string name="add_stock_button_description">إضافة أسهم</string>

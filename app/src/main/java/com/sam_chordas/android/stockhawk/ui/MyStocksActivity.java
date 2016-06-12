@@ -128,7 +128,7 @@ public class MyStocksActivity extends AppCompatActivity implements LoaderManager
                       new String[] { input.toString() }, null);
                   if (c.getCount() != 0) {
                     Toast toast =
-                        Toast.makeText(MyStocksActivity.this, "This stock is already saved!",
+                        Toast.makeText(MyStocksActivity.this, getResources().getString(R.string.stock_already_saved),
                             Toast.LENGTH_LONG);
                     toast.setGravity(Gravity.CENTER, Gravity.CENTER, 0);
                     toast.show();
@@ -148,6 +148,7 @@ public class MyStocksActivity extends AppCompatActivity implements LoaderManager
 
       }
     });
+    fab.setContentDescription(getResources().getString(R.string.add_stock_button_description));
 
     ItemTouchHelper.Callback callback = new SimpleItemTouchHelperCallback(mCursorAdapter);
     mItemTouchHelper = new ItemTouchHelper(callback);
@@ -183,7 +184,7 @@ public class MyStocksActivity extends AppCompatActivity implements LoaderManager
         case StockTaskService.STOCK_STATUS_OK:
           break;
         case StockTaskService.STOCK_STATUS_INVALID:
-          Toast.makeText(context, "No Stocks Found", Toast.LENGTH_SHORT).show();
+          Toast.makeText(context, getString(R.string.invalid_stock_symbol), Toast.LENGTH_SHORT).show();
           break;
         case StockTaskService.STOCK_STATUS_SERVER_DOWN:
         case StockTaskService.STOCK_STATUS_SERVER_INVALID:
