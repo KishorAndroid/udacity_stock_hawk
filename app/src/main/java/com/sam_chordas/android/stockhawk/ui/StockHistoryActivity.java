@@ -11,9 +11,11 @@ import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v4.content.LocalBroadcastManager;
+import android.support.v4.widget.ContentLoadingProgressBar;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 import android.view.MenuItem;
+import android.view.View;
 import android.widget.Toast;
 
 import com.github.mikephil.charting.charts.LineChart;
@@ -35,13 +37,21 @@ import java.util.Collections;
 public class StockHistoryActivity extends AppCompatActivity {
 
     LineChart chart;
+    ContentLoadingProgressBar loadingProgressBar;
+    ArrayList<Quote> histoicalData = new ArrayList<>();
+    Bundle savedInstanceState;
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_line_graph);
+
         chart = (LineChart) findViewById(R.id.chart);
         chart.setDescription(getResources().getString(R.string.chart_description));
+
+        loadingProgressBar = (ContentLoadingProgressBar) findViewById(R.id.content_loading);
+
+        this.savedInstanceState = savedInstanceState;
     }
 
     @Override
@@ -60,9 +70,17 @@ public class StockHistoryActivity extends AppCompatActivity {
         boolean isConnected = activeNetwork != null &&
                 activeNetwork.isConnectedOrConnecting();
         if(isConnected) {
-            Intent intent = new Intent(this, StockHistoryIntentService.class);
-            intent.putExtra("SYMBOL", getIntent().getStringExtra("SYMBOL"));
-            startService(intent);
+            if(savedInstanceState != null && !savedInstanceState.getParcelableArrayList("HISTORICAL_DATA").isEmpty()){
+                histoicalData = savedInstanceState.getParcelableArrayList("HISTORICAL_DATA");
+                new PopulateChartView().execute(histoicalData);
+            }else {
+                Intent intent = new Intent(this, StockHistoryIntentService.class);
+                intent.putExtra("SYMBOL", getIntent().getStringExtra("SYMBOL"));
+                startService(intent);
+            }
+        }
+        else {
+            networkToast();
         }
     }
 
@@ -80,6 +98,8 @@ public class StockHistoryActivity extends AppCompatActivity {
 
             if(quotes != null && quotes.size() > 0) {
 
+                histoicalData = quotes;
+
                 new PopulateChartView().execute(quotes);
 
             }
@@ -95,6 +115,13 @@ public class StockHistoryActivity extends AppCompatActivity {
                 break;
         }
         return super.onOptionsItemSelected(item);
+    }
+
+    private void showChart(LineData lineData){
+        loadingProgressBar.setVisibility(View.INVISIBLE);
+        chart.setVisibility(View.VISIBLE);
+        chart.setData(lineData);
+        chart.invalidate();
     }
 
     private class PopulateChartView extends AsyncTask<ArrayList<Quote>, Void, LineData>{
@@ -160,8 +187,17 @@ public class StockHistoryActivity extends AppCompatActivity {
         @Override
         protected void onPostExecute(LineData lineData) {
             super.onPostExecute(lineData);
-            chart.setData(lineData);
-            chart.invalidate(); // refresh
+            showChart(lineData);
         }
+    }
+
+    @Override
+    protected void onSaveInstanceState(Bundle outState) {
+        super.onSaveInstanceState(outState);
+        outState.putParcelableArrayList("HISTORICAL_DATA", histoicalData);
+    }
+
+    public void networkToast(){
+        Toast.makeText(this, getString(R.string.network_toast), Toast.LENGTH_SHORT).show();
     }
 }

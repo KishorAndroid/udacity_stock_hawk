@@ -149,6 +149,7 @@ public class StockTaskService extends GcmTaskService{
           mContext.getContentResolver().applyBatch(QuoteProvider.AUTHORITY,
               Utils.quoteJsonToContentVals(getResponse));
 
+          //Update Widget
           Intent dataUpdatedIntent = new Intent(ACTION_DATA_UPDATED)
                   .setPackage(mContext.getPackageName());
           mContext.sendBroadcast(dataUpdatedIntent);

@@ -17,6 +17,7 @@ import java.net.URLEncoder;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
+import java.util.Locale;
 
 /**
  * Created by kishor on 6/6/16.
@@ -53,7 +54,7 @@ public class StockHistoryIntentService extends IntentService {
     private String prepareYQLQuery(String stockSymbol) throws UnsupportedEncodingException {
 
         Date currentDate = Calendar.getInstance().getTime();
-        java.text.SimpleDateFormat simpleDateFormat = new java.text.SimpleDateFormat("yyyy-MM-dd");
+        java.text.SimpleDateFormat simpleDateFormat = new java.text.SimpleDateFormat("yyyy-MM-dd", Locale.US);
         String formattedEndDate = simpleDateFormat.format(currentDate);
         Calendar cal = Calendar.getInstance();
         cal.add(Calendar.MONTH, -1);
